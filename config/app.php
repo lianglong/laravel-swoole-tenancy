@@ -175,6 +175,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         App\Providers\ResponseMacroServiceProvider::class,//自定义输出格式
+        App\Providers\TenancyServiceProvider::class,//租户服务
     ],
 
     /*

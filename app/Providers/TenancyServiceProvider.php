@@ -12,6 +12,7 @@ use Stancl\Tenancy\Events;
 use Stancl\Tenancy\Jobs;
 use Stancl\Tenancy\Listeners;
 use Stancl\Tenancy\Middleware;
+use Stancl\Tenancy\Resolvers\PathTenantResolver;
 use Stancl\Tenancy\Resolvers\RequestDataTenantResolver;
 
 class TenancyServiceProvider extends ServiceProvider
@@ -100,17 +101,36 @@ class TenancyServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        /**
+         * ByRequestData 租户识别方式相关设置
+         */
         //租户匹配来源字段(header)
         Middleware\InitializeTenancyByRequestData::$header = 'x-credential-identifier';
         //禁用通过查询参数匹配租户
         Middleware\InitializeTenancyByRequestData::$queryParameter = null;
         //开启租户信息缓存 #see https://tenancyforlaravel.com/docs/v3/cached-lookup
         RequestDataTenantResolver::$shouldCache = true;
-
+        //设置租户信息缓存有效时间
+        RequestDataTenantResolver::$cacheTTL = 86400;
         //租户匹配失败时提示
         Middleware\InitializeTenancyByRequestData::$onFail = function (\Exception $e, Request $request, \Closure $next){
             return response()->error($e);
         };
+        /**
+         * ByPath 租户识别方式相关设置
+         */
+        //租户匹配来源字段 route param
+        PathTenantResolver::$tenantParameterName = 'tenant';
+        //开启租户信息缓存
+        PathTenantResolver::$shouldCache = true;
+        //设置租户信息缓存有效时间
+        RequestDataTenantResolver::$cacheTTL = 86400;
+        //租户匹配失败时提示
+        Middleware\InitializeTenancyByPath::$onFail = function (\Exception $e, Request $request, \Closure $next){
+            return response()->error($e);
+        };
+
+
 
         $this->bootEvents();
         $this->mapRoutes();
