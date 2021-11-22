@@ -124,7 +124,7 @@ class TenancyServiceProvider extends ServiceProvider
         //开启租户信息缓存
         PathTenantResolver::$shouldCache = true;
         //设置租户信息缓存有效时间
-        RequestDataTenantResolver::$cacheTTL = 86400;
+        PathTenantResolver::$cacheTTL = 86400;
         //租户匹配失败时提示
         Middleware\InitializeTenancyByPath::$onFail = function (\Exception $e, Request $request, \Closure $next){
             return response()->error($e);
